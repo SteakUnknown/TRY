@@ -2,7 +2,7 @@ import markdown
 
 # --- Settings ---
 input_md_file = "README.md"
-output_html_file = "output.html"
+output_html_file = "index.html"
 
 # --- Read Markdown File ---
 with open(input_md_file, "r", encoding="utf-8") as f:
