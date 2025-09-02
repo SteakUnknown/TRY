@@ -1,16 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Markdown to HTML</title>
+  <meta charset="UTF-8">
+  <title>Markdown Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <div id="content"></div>
+  <h1>Markdown Rendered Below:</h1>
+  <div id="content">Loading markdown...</div>
 
   <script>
     fetch('README.md')
-      .then(response => response.text())
+      .then(response => {
+        if (!response.ok) throw new Error("Markdown file not found");
+        return response.text();
+      })
       .then(markdown => {
         document.getElementById('content').innerHTML = marked.parse(markdown);
+      })
+      .catch(err => {
+        document.getElementById('content').innerHTML = `<p style="color:red;">Error loading markdown: ${err.message}</p>`;
       });
   </script>
 </body>
