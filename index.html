@@ -97,13 +97,14 @@
       color: white;
     }
 
-    /* --- FOOTER --- */
+    /* --- FOOTER styles (added dynamically) --- */
     .site-footer {
       background-color: #1e1e1e;
       padding: 2em 1em;
       text-align: center;
       font-size: 0.95em;
       color: #ccc;
+      margin-top: 2rem;
     }
 
     .site-footer a {
@@ -127,14 +128,7 @@
   <!-- Main content -->
   <div class="markdown-body" id="content">Loading markdown...</div>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <p>
-      <a href="https://github.com/SteakUnknown/TRY" target="_blank" rel="noopener noreferrer">
-        View this project on GitHub →
-      </a>
-    </p>
-  </footer>
+  <!-- NOTE: Footer will be dynamically inserted here after markdown loads -->
 
   <!-- Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
@@ -191,6 +185,18 @@
         });
 
         hljs.highlightAll();
+
+        // Now add the footer dynamically AFTER markdown loaded
+        const footer = document.createElement('footer');
+        footer.className = 'site-footer';
+        footer.innerHTML = `
+          <p>
+            <a href="https://github.com/SteakUnknown/TRY" target="_blank" rel="noopener noreferrer">
+              View this project on GitHub →
+            </a>
+          </p>
+        `;
+        document.body.appendChild(footer);
       })
       .catch(err => {
         document.getElementById('content').innerHTML =
