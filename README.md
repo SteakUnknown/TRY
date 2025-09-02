@@ -1,1 +1,3 @@
-# CutsceneManager 2.2 (logo here)
+# Hello Markdown!
+
+This is **markdown** rendered in the browser using `marked.js`.
