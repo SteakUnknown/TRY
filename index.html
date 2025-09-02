@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Markdown Viewer with Lua + Copy Button + Footer</title>
+  <title>Markdown Viewer with Lua + Copy Button + Footer + Topbar</title>
 
   <style>
     html, body {
@@ -18,9 +18,53 @@
       background: #f5f5f5;
     }
 
+    /* --- TOPBAR --- */
+    header.topbar {
+      background-color: #24292e;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 3.5rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header.topbar .logo {
+      font-weight: 700;
+      font-size: 1.25rem;
+      user-select: none;
+    }
+
+    nav.topbar-nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav.topbar-nav a {
+      color: #c9d1d9;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+    nav.topbar-nav a:hover,
+    nav.topbar-nav a:focus {
+      background-color: #444c56;
+      color: white;
+      outline: none;
+    }
+
+    /* --- MAIN CONTENT --- */
     .markdown-body {
       max-width: 800px;
-      margin: auto;
+      margin: 2rem auto 0 auto;
       background: #ffffff;
       padding: 2rem;
       border-radius: 8px;
@@ -97,7 +141,7 @@
       color: white;
     }
 
-    /* --- FOOTER styles (added dynamically) --- */
+    /* --- FOOTER --- */
     .site-footer {
       background-color: #1e1e1e;
       padding: 2em 1em;
@@ -125,6 +169,16 @@
   </style>
 </head>
 <body>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="logo">Document Creator</div>
+    <nav class="topbar-nav" role="navigation" aria-label="Primary">
+      <a href="#" tabindex="0">Home</a>
+      <a href="#" tabindex="0">About</a>
+      <a href="#" tabindex="0">Create Document</a>
+    </nav>
+  </header>
+
   <!-- Main content -->
   <div class="markdown-body" id="content">Loading markdown...</div>
 
