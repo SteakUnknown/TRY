@@ -72,9 +72,6 @@
 
 </head>
 <body>
-  <h1>Markdown Rendered Below:</h1>
-  <div id="content">Loading markdown...</div>
-
   <script>
     fetch('README.md')
       .then(response => {
@@ -82,7 +79,7 @@
         return response.text();
       })
       .then(markdown => {
-        document.getElementById('content').innerHTML = marked.parse(markdown);
+        document..innerHTML = marked.parse(markdown);
       })
       .catch(err => {
         document.getElementById('content').innerHTML = `<p style="color:red;">Error loading markdown: ${err.message}</p>`;
