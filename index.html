@@ -79,7 +79,7 @@
         return response.text();
       })
       .then(markdown => {
-        document.innerHTML = marked.parse(markdown);
+        document.getElementById('content').innerHTML = marked.parse(markdown);
       })
       .catch(err => {
         document.getElementById('content').innerHTML = `<p style="color:red;">Error loading markdown: ${err.message}</p>`;
