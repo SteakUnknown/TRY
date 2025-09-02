@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,10 +7,10 @@
   <!-- GitHub-style markdown (optional) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
 
-  <!-- Highlight.js styles -->
+  <!-- Highlight.js style (GitHub Dark theme shown here) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 
-  <!-- Highlight.js and Marked.js -->
+  <!-- Marked and Highlight.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
@@ -35,6 +34,7 @@
       .then(response => response.text())
       .then(markdown => {
         document.getElementById('content').innerHTML = marked.parse(markdown);
+        hljs.highlightAll(); // <- This is required to trigger highlighting
       })
       .catch(error => {
         document.getElementById('content').innerHTML = `<pre>Error: ${error.message}</pre>`;
@@ -42,4 +42,3 @@
   </script>
 </body>
 </html>
-
