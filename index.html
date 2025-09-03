@@ -40,14 +40,6 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
   padding:0.4rem 0.7rem; cursor:pointer; font-weight:bold;
 }
 
-/* Mobile toggle button */
-.nav-toggle-btn {
-  background:#444c56; color:white; border:none;
-  padding:0.3rem 0.6rem; border-radius:4px;
-  cursor:pointer; font-size:0.9rem;
-}
-.nav-toggle-btn:hover { background:#57606a; }
-
 .main-container {
   display:flex; max-width:1200px; margin:2rem auto; flex:1; gap:2rem;
 }
@@ -59,20 +51,16 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
   box-sizing:border-box;
   overflow-x:auto;
 }
-.markdown-body pre { white-space:pre; overflow:auto; margin:0; }
-.code-block-wrapper {
-  position: relative;
-  margin: 1.5em 0;
-  overflow: auto;
-  border-radius: 6px;
-  background: #f6f8fa;
+.markdown-body pre {
+  white-space:pre-wrap; word-wrap:break-word;
+  overflow-x:auto;
 }
+.code-block-wrapper { position:relative; margin:1.5em 0; }
 .markdown-body pre code {
-  display:block; padding:1em 3.5em 1em 1em;
-  border-radius:6px;
+  display:block; padding:1em; border-radius:6px;
   font-family:"Fira Code", monospace;
   font-size:0.95em; line-height:1.5;
-  color:#24292e;
+  background-color:#f6f8fa; color:#24292e;
   transition:background 0.3s,color 0.3s;
 }
 
@@ -97,51 +85,78 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
   opacity: 1;
   pointer-events: auto;
 }
-.floating-copy-btn:hover { background:#d0d7de; }
-.floating-copy-btn.copied {
-  background:#28a745;
-  color:white;
+.floating-copy-btn.always-visible {  /* 📱 Mobile override */
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
-/* Mobile popup */
-.menu-overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:900; }
-.menu-overlay.active { opacity:1; pointer-events:auto; }
-.menu-popup { position:fixed;top:5rem;right:0;width:80%;max-width:300px;height:calc(100vh - 5rem);background:#fff;border-left:1px solid #ddd;box-shadow:-2px 0 5px rgba(0,0,0,0.2);transform:translateX(100%);transition:transform 0.3s ease;z-index:1000;display:flex;flex-direction:column;padding:1rem; }
-.menu-popup.open { transform:translateX(0); }
-.menu-popup a { display:block;margin-bottom:1rem;font-size:1.1rem;text-decoration:none;color:#0366d6; }
-.menu-popup a:hover { text-decoration:underline; }
+/* Markdown responsiveness */
+.markdown-body img, 
+.markdown-body table,
+.markdown-body pre,
+.markdown-body code {
+  max-width:100%;
+  display:block;
+  overflow-x:auto;
+}
+.markdown-body img {
+  height:auto;
+}
 
 /* Dark mode */
 body.dark-mode { background:#121212; color:#e0e0e0; }
 body.dark-mode .markdown-body { background:#1c1c1c; color:#e0e0e0; }
 body.dark-mode a { color:#58a6ff; }
-body.dark-mode .code-block-wrapper { background:#2c2c2c; }
-body.dark-mode .markdown-body pre code { color:#f5f5f5; }
+body.dark-mode .markdown-body pre code { background:#2c2c2c; color:#f5f5f5; }
 body.dark-mode .floating-copy-btn { background:#444c56; color:#e0e0e0; }
 body.dark-mode .floating-copy-btn.copied { background:#28a745; color:white; }
-body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
-body.dark-mode .menu-popup a { color:#3399ff; }
 
-footer { background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%); text-align:center; padding:30px 0; margin-top:auto; }
-footer .github-link {
-  display:inline-block; padding:12px 28px;
-  background:#2da44e; color:white;
-  font-size:1.1rem; font-weight:600;
-  text-decoration:none; border-radius:8px;
-  box-shadow:0 4px 6px rgba(0,0,0,0.15);
-  transition:background 0.2s, transform 0.1s, box-shadow 0.2s;
+footer {
+  background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%);
+  color:#b3b3b3; text-align:center; padding:20px 0;
+  margin-top:auto;
 }
-footer .github-link:hover { background:#2c974b; transform:translateY(-3px); box-shadow:0 6px 10px rgba(0,0,0,0.2); }
-footer .github-link:active { background:#298e46; transform:translateY(0); box-shadow:0 3px 5px rgba(0,0,0,0.15); }
-body.dark-mode footer { background:linear-gradient(180deg,#0d1117 0%,#010409 100%); }
-body.dark-mode footer .github-link { background:#238636; color:#f0f6fc; box-shadow:0 4px 6px rgba(0,0,0,0.5); }
-body.dark-mode footer .github-link:hover { background:#2ea043; box-shadow:0 6px 10px rgba(0,0,0,0.6); }
-body.dark-mode footer .github-link:active { background:#196c2e; box-shadow:0 3px 5px rgba(0,0,0,0.5); }
-
-@media(max-width:1000px) {
-  nav.topbar-nav { display:none; }
-  .main-container { flex-direction: column; margin: 1rem; gap: 1rem; max-width: 100%; }
-  .markdown-body { padding: 1rem; max-width: 100%; }
+footer .footer-container {
+  text-align: center;
+}
+footer .github-link {
+  display: inline-block;
+  padding: 12px 28px;
+  background: #2da44e;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+footer .github-link:hover {
+  background: #2c974b;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+footer .github-link:active {
+  background: #298e46;
+  transform: translateY(0);
+  box-shadow: 0 3px 5px rgba(0,0,0,0.15);
+}
+/* Dark mode footer */
+body.dark-mode footer {
+  background: linear-gradient(180deg, #0d1117 0%, #010409 100%);
+}
+body.dark-mode footer .github-link {
+  background: #238636;
+  color: #f0f6fc;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+}
+body.dark-mode footer .github-link:hover {
+  background: #2ea043;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.6);
+}
+body.dark-mode footer .github-link:active {
+  background: #196c2e;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.5);
 }
 </style>
 </head>
@@ -162,29 +177,29 @@ body.dark-mode footer .github-link:active { background:#196c2e; box-shadow:0 3px
   <div class="markdown-body" id="content">Loading markdown...</div>
 </div>
 
-<div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-popup" id="menuPopup"><div id="mobileTabsContainer"></div></div>
-
 <footer>
-  <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer" class="github-link">
-    View this project on GitHub →
-  </a>
+  <div class="footer-container">
+    <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer" class="github-link">
+      View this project on GitHub →
+    </a>
+  </div>
 </footer>
 
-<button class="floating-copy-btn" id="floatingCopyBtn" type="button" aria-label="Copy code">Copy</button>
+<!-- Floating copy button -->
+<button id="floatingCopyBtn" class="floating-copy-btn">Copy</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
 
 <script>
 const hljsLight = document.getElementById('hljs-light');
 const hljsDark = document.getElementById('hljs-dark');
 const floatingBtn = document.getElementById('floatingCopyBtn');
-
 let activeWrapper = null;
 let activeCodeEl = null;
-let copyResetTimer = null;
 
+// Markdown rendering
 function renderMarkdown(mdFile) {
   fetch(mdFile + '?cache=' + Date.now())
     .then(r => r.ok ? r.text() : Promise.reject())
@@ -193,21 +208,15 @@ function renderMarkdown(mdFile) {
       const container = document.getElementById('content');
       container.innerHTML = marked.parse(markdown);
 
-      const codeBlocks = container.querySelectorAll('pre > code');
-      codeBlocks.forEach(code => {
+      container.querySelectorAll('pre > code').forEach(code => {
         const wrapper = document.createElement('div');
         wrapper.className = 'code-block-wrapper';
         const pre = code.parentElement;
         pre.parentElement.insertBefore(wrapper, pre);
         wrapper.appendChild(pre);
 
-        // Hover enter -> show
         wrapper.addEventListener('mouseenter', () => setActiveWrapper(wrapper, code));
-        // Hover leave -> hide
         wrapper.addEventListener('mouseleave', hideFloatingBtn);
-        // Touch -> show (mobile)
-        wrapper.addEventListener('touchstart', () => setActiveWrapper(wrapper, code), {passive:true});
-        wrapper.addEventListener('scroll', positionFloatingBtn, {passive:true});
       });
 
       hljs.highlightAll();
@@ -218,10 +227,17 @@ function setActiveWrapper(wrapper, codeEl) {
   activeWrapper = wrapper;
   activeCodeEl = codeEl;
   positionFloatingBtn();
-  floatingBtn.classList.add('show');
+
+  // Mobile always visible, desktop only on hover
+  if (window.innerWidth <= 1000) {
+    floatingBtn.classList.add('always-visible');
+  } else {
+    floatingBtn.classList.add('show');
+  }
 }
 
 function hideFloatingBtn() {
+  if (window.innerWidth <= 1000) return; // keep visible on mobile
   floatingBtn.classList.remove('show');
   activeWrapper = null;
   activeCodeEl = null;
@@ -229,45 +245,28 @@ function hideFloatingBtn() {
 
 function positionFloatingBtn() {
   if (!activeWrapper) return;
-
   const rect = activeWrapper.getBoundingClientRect();
-  const btnRect = floatingBtn.getBoundingClientRect();
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-
-  if (rect.bottom <= 0 || rect.top >= vh || rect.right <= 0 || rect.left >= vw) {
-    hideFloatingBtn();
-    return;
-  }
-
-  const visibleRight = Math.min(rect.right, vw);
-  const visibleTop = Math.max(rect.top, 0);
-
-  const left = Math.max(visibleRight - btnRect.width - 8, rect.left + 8);
-  const top  = Math.min(Math.max(visibleTop + 8, 8), rect.bottom - btnRect.height - 8);
-
-  floatingBtn.style.left = left + 'px';
-  floatingBtn.style.top  = top + 'px';
+  floatingBtn.style.top = (window.scrollY + rect.top + 8) + "px";
+  floatingBtn.style.left = (window.scrollX + rect.right - floatingBtn.offsetWidth - 8) + "px";
 }
 
+// Copy functionality
 floatingBtn.addEventListener('click', () => {
   if (!activeCodeEl) return;
   navigator.clipboard.writeText(activeCodeEl.innerText).then(() => {
     floatingBtn.classList.add('copied');
-    const original = floatingBtn.textContent;
     floatingBtn.textContent = 'Copied!';
-    clearTimeout(copyResetTimer);
-    copyResetTimer = setTimeout(() => {
-      floatingBtn.textContent = original;
+    setTimeout(() => {
+      floatingBtn.textContent = 'Copy';
       floatingBtn.classList.remove('copied');
     }, 1500);
   });
 });
 
-window.addEventListener('scroll', positionFloatingBtn, {passive:true});
+window.addEventListener('scroll', positionFloatingBtn);
 window.addEventListener('resize', positionFloatingBtn);
 
-/* Dark mode */
+// Dark mode
 function setMode(isDark) {
   document.body.classList.toggle('dark-mode', isDark);
   hljsLight.disabled = isDark;
@@ -275,12 +274,13 @@ function setMode(isDark) {
   localStorage.setItem('mode', isDark ? 'dark' : 'light');
   document.getElementById('modeToggle').innerText = isDark ? 'Light Mode' : 'Dark Mode';
 }
-setMode(localStorage.getItem('mode') === 'dark');
+const savedMode = localStorage.getItem('mode');
+setMode(savedMode === 'dark');
 document.getElementById('modeToggle').addEventListener('click', () => {
   setMode(!document.body.classList.contains('dark-mode'));
 });
 
-/* Navigation */
+// Load home page
 document.getElementById('homeBtn').addEventListener('click', e => {
   e.preventDefault();
   document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
@@ -292,10 +292,12 @@ document.querySelectorAll('.page-link').forEach(link => {
     e.preventDefault();
     document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
     link.classList.add('active-tab');
-    renderMarkdown(link.getAttribute('data-md'));
+    const mdFile = link.getAttribute('data-md');
+    if(mdFile) renderMarkdown(mdFile);
   });
 });
 
+// Initial load
 renderMarkdown('README.md');
 </script>
 </body>
