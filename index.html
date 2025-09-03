@@ -59,21 +59,16 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
   box-sizing:border-box;
   overflow-x:auto;
 }
-.markdown-body pre {
-  white-space:pre; /* keep code formatting; horizontal scroll lives inside wrapper */
-  overflow:auto;
-  margin:0;
-}
+.markdown-body pre { white-space:pre; overflow:auto; margin:0; }
 .code-block-wrapper {
   position: relative;
   margin: 1.5em 0;
-  overflow: auto; /* scroll container for the <pre> */
+  overflow: auto;
   border-radius: 6px;
   background: #f6f8fa;
 }
-/* Add extra right padding so the floating button never covers code text */
 .markdown-body pre code {
-  display:block; padding:1em 3.5em 1em 1em; /* extra right padding */
+  display:block; padding:1em 3.5em 1em 1em;
   border-radius:6px;
   font-family:"Fira Code", monospace;
   font-size:0.95em; line-height:1.5;
@@ -81,10 +76,10 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
   transition:background 0.3s,color 0.3s;
 }
 
-/* Floating copy button that follows scroll but stays in the codeblock corner */
+/* Floating copy button */
 .floating-copy-btn {
-  position: fixed; /* follows viewport; we place it at the codeblock's visible corner */
-  top: -9999px; left: -9999px; /* hidden offscreen until activated */
+  position: fixed;
+  top: -9999px; left: -9999px;
   z-index: 1100;
   padding: 0.35rem 0.6rem;
   font-size: 0.8rem;
@@ -109,39 +104,11 @@ nav.topbar-nav a:hover { background:#444c56; color:white; }
 }
 
 /* Mobile popup */
-.menu-overlay {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.3);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 900;
-}
+.menu-overlay { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:900; }
 .menu-overlay.active { opacity:1; pointer-events:auto; }
-
-.menu-popup {
-  position: fixed; top:5rem; right:0;
-  width:80%; max-width:300px;
-  height:calc(100vh - 5rem);
-  background:#fff; border-left:1px solid #ddd;
-  box-shadow:-2px 0 5px rgba(0,0,0,0.2);
-  transform:translateX(100%);
-  transition: transform 0.3s ease;
-  z-index:1000;
-  display:flex;
-  flex-direction:column;
-  padding:1rem;
-}
+.menu-popup { position:fixed;top:5rem;right:0;width:80%;max-width:300px;height:calc(100vh - 5rem);background:#fff;border-left:1px solid #ddd;box-shadow:-2px 0 5px rgba(0,0,0,0.2);transform:translateX(100%);transition:transform 0.3s ease;z-index:1000;display:flex;flex-direction:column;padding:1rem; }
 .menu-popup.open { transform:translateX(0); }
-
-/* Popup links stacked vertically */
-.menu-popup a {
-  display:block;
-  margin-bottom:1rem;
-  font-size:1.1rem;
-  text-decoration:none;
-  color:#0366d6;
-}
+.menu-popup a { display:block;margin-bottom:1rem;font-size:1.1rem;text-decoration:none;color:#0366d6; }
 .menu-popup a:hover { text-decoration:underline; }
 
 /* Dark mode */
@@ -155,67 +122,26 @@ body.dark-mode .floating-copy-btn.copied { background:#28a745; color:white; }
 body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
 body.dark-mode .menu-popup a { color:#3399ff; }
 
-footer {
-  background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%);
-  text-align:center; padding:30px 0;
-  margin-top:auto;
-}
-
-/* GitHub button */
+footer { background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%); text-align:center; padding:30px 0; margin-top:auto; }
 footer .github-link {
-  display:inline-block;
-  padding:12px 28px;
-  background:#2da44e;
-  color:white;
-  font-size:1.1rem;
-  font-weight:600;
-  text-decoration:none;
-  border-radius:8px;
+  display:inline-block; padding:12px 28px;
+  background:#2da44e; color:white;
+  font-size:1.1rem; font-weight:600;
+  text-decoration:none; border-radius:8px;
   box-shadow:0 4px 6px rgba(0,0,0,0.15);
-  transition:background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  transition:background 0.2s, transform 0.1s, box-shadow 0.2s;
 }
-footer .github-link:hover {
-  background:#2c974b;
-  transform:translateY(-3px);
-  box-shadow:0 6px 10px rgba(0,0,0,0.2);
-}
-footer .github-link:active {
-  background:#298e46;
-  transform:translateY(0);
-  box-shadow:0 3px 5px rgba(0,0,0,0.15);
-}
+footer .github-link:hover { background:#2c974b; transform:translateY(-3px); box-shadow:0 6px 10px rgba(0,0,0,0.2); }
+footer .github-link:active { background:#298e46; transform:translateY(0); box-shadow:0 3px 5px rgba(0,0,0,0.15); }
+body.dark-mode footer { background:linear-gradient(180deg,#0d1117 0%,#010409 100%); }
+body.dark-mode footer .github-link { background:#238636; color:#f0f6fc; box-shadow:0 4px 6px rgba(0,0,0,0.5); }
+body.dark-mode footer .github-link:hover { background:#2ea043; box-shadow:0 6px 10px rgba(0,0,0,0.6); }
+body.dark-mode footer .github-link:active { background:#196c2e; box-shadow:0 3px 5px rgba(0,0,0,0.5); }
 
-/* 🌙 Dark Mode GitHub button */
-body.dark-mode footer {
-  background:linear-gradient(180deg,#0d1117 0%,#010409 100%);
-}
-body.dark-mode footer .github-link {
-  background:#238636;
-  color:#f0f6fc;
-  box-shadow:0 4px 6px rgba(0,0,0,0.5);
-}
-body.dark-mode footer .github-link:hover {
-  background:#2ea043;
-  box-shadow:0 6px 10px rgba(0,0,0,0.6);
-}
-body.dark-mode footer .github-link:active {
-  background:#196c2e;
-  box-shadow:0 3px 5px rgba(0,0,0,0.5);
-}
-
-/* Responsive adjustments for mobile */
 @media(max-width:1000px) {
-  nav.topbar-nav { display:none; } /* hide topbar links on mobile */
-  .main-container {
-    flex-direction: column;
-    margin: 1rem;
-    gap: 1rem;
-    max-width: 100%;
-  }
-  .markdown-body {
-    padding: 1rem;
-    max-width: 100%;
-  }
+  nav.topbar-nav { display:none; }
+  .main-container { flex-direction: column; margin: 1rem; gap: 1rem; max-width: 100%; }
+  .markdown-body { padding: 1rem; max-width: 100%; }
 }
 </style>
 </head>
@@ -236,11 +162,8 @@ body.dark-mode footer .github-link:active {
   <div class="markdown-body" id="content">Loading markdown...</div>
 </div>
 
-<!-- Mobile overlay & popup -->
 <div class="menu-overlay" id="menuOverlay"></div>
-<div class="menu-popup" id="menuPopup">
-  <div id="mobileTabsContainer"></div>
-</div>
+<div class="menu-popup" id="menuPopup"><div id="mobileTabsContainer"></div></div>
 
 <footer>
   <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer" class="github-link">
@@ -248,26 +171,20 @@ body.dark-mode footer .github-link:active {
   </a>
 </footer>
 
-<!-- Floating copy button (one instance for all code blocks) -->
 <button class="floating-copy-btn" id="floatingCopyBtn" type="button" aria-label="Copy code">Copy</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
 
 <script>
 const hljsLight = document.getElementById('hljs-light');
 const hljsDark = document.getElementById('hljs-dark');
-const menuPopup = document.getElementById('menuPopup');
-const menuOverlay = document.getElementById('menuOverlay');
-const mobileTabsContainer = document.getElementById('mobileTabsContainer');
 const floatingBtn = document.getElementById('floatingCopyBtn');
 
 let activeWrapper = null;
 let activeCodeEl = null;
 let copyResetTimer = null;
 
-/* ------- Markdown rendering & code wrapping ------- */
 function renderMarkdown(mdFile) {
   fetch(mdFile + '?cache=' + Date.now())
     .then(r => r.ok ? r.text() : Promise.reject())
@@ -276,7 +193,6 @@ function renderMarkdown(mdFile) {
       const container = document.getElementById('content');
       container.innerHTML = marked.parse(markdown);
 
-      // Wrap code blocks
       const codeBlocks = container.querySelectorAll('pre > code');
       codeBlocks.forEach(code => {
         const wrapper = document.createElement('div');
@@ -285,33 +201,23 @@ function renderMarkdown(mdFile) {
         pre.parentElement.insertBefore(wrapper, pre);
         wrapper.appendChild(pre);
 
-        // Activate floating button when user interacts with this block
-        const activate = () => setActiveWrapper(wrapper, code);
-        wrapper.addEventListener('mouseenter', activate);
-        wrapper.addEventListener('mousemove', activate);
-        wrapper.addEventListener('touchstart', activate, {passive:true});
-        wrapper.addEventListener('focusin', activate);
-
-        // Reposition button when user scrolls this wrapper horizontally
+        // Hover enter -> show
+        wrapper.addEventListener('mouseenter', () => setActiveWrapper(wrapper, code));
+        // Hover leave -> hide
+        wrapper.addEventListener('mouseleave', hideFloatingBtn);
+        // Touch -> show (mobile)
+        wrapper.addEventListener('touchstart', () => setActiveWrapper(wrapper, code), {passive:true});
         wrapper.addEventListener('scroll', positionFloatingBtn, {passive:true});
       });
 
       hljs.highlightAll();
-      positionFloatingBtn(); // ensure placement if something is already hovered
     });
 }
 
-/* ------- Floating copy button logic ------- */
 function setActiveWrapper(wrapper, codeEl) {
-  if (activeWrapper !== wrapper) {
-    activeWrapper = wrapper;
-    activeCodeEl = codeEl;
-  }
+  activeWrapper = wrapper;
+  activeCodeEl = codeEl;
   positionFloatingBtn();
-  showFloatingBtn();
-}
-
-function showFloatingBtn() {
   floatingBtn.classList.add('show');
 }
 
@@ -322,40 +228,31 @@ function hideFloatingBtn() {
 }
 
 function positionFloatingBtn() {
-  if (!activeWrapper) { hideFloatingBtn(); return; }
+  if (!activeWrapper) return;
 
   const rect = activeWrapper.getBoundingClientRect();
   const btnRect = floatingBtn.getBoundingClientRect();
   const vw = window.innerWidth;
   const vh = window.innerHeight;
 
-  // If wrapper not on screen, hide
   if (rect.bottom <= 0 || rect.top >= vh || rect.right <= 0 || rect.left >= vw) {
     hideFloatingBtn();
     return;
   }
 
-  // Visible right edge is the min of wrapper right and viewport right
   const visibleRight = Math.min(rect.right, vw);
-  // Visible top edge is the max of wrapper top and viewport top
   const visibleTop = Math.max(rect.top, 0);
 
-  const left = Math.max(visibleRight - btnRect.width - 8, Math.max(rect.left + 8, 8));
-  const top  = Math.min(
-    Math.max(visibleTop + 8, 8),
-    rect.bottom - btnRect.height - 8
-  );
+  const left = Math.max(visibleRight - btnRect.width - 8, rect.left + 8);
+  const top  = Math.min(Math.max(visibleTop + 8, 8), rect.bottom - btnRect.height - 8);
 
   floatingBtn.style.left = left + 'px';
   floatingBtn.style.top  = top + 'px';
-  showFloatingBtn();
 }
 
-// Copy to clipboard
 floatingBtn.addEventListener('click', () => {
   if (!activeCodeEl) return;
-  const text = activeCodeEl.innerText;
-  navigator.clipboard.writeText(text).then(() => {
+  navigator.clipboard.writeText(activeCodeEl.innerText).then(() => {
     floatingBtn.classList.add('copied');
     const original = floatingBtn.textContent;
     floatingBtn.textContent = 'Copied!';
@@ -367,11 +264,10 @@ floatingBtn.addEventListener('click', () => {
   });
 });
 
-// Reposition on page scroll/resize
 window.addEventListener('scroll', positionFloatingBtn, {passive:true});
 window.addEventListener('resize', positionFloatingBtn);
 
-/* ------- Dark mode ------- */
+/* Dark mode */
 function setMode(isDark) {
   document.body.classList.toggle('dark-mode', isDark);
   hljsLight.disabled = isDark;
@@ -379,59 +275,12 @@ function setMode(isDark) {
   localStorage.setItem('mode', isDark ? 'dark' : 'light');
   document.getElementById('modeToggle').innerText = isDark ? 'Light Mode' : 'Dark Mode';
 }
-const savedMode = localStorage.getItem('mode');
-setMode(savedMode === 'dark');
+setMode(localStorage.getItem('mode') === 'dark');
 document.getElementById('modeToggle').addEventListener('click', () => {
   setMode(!document.body.classList.contains('dark-mode'));
 });
 
-/* ------- Mobile menu ------- */
-function openMenu() {
-  menuPopup.classList.add('open');
-  menuOverlay.classList.add('active');
-}
-function closeMenu() {
-  menuPopup.classList.remove('open');
-  menuOverlay.classList.remove('active');
-}
-menuOverlay.addEventListener('click', closeMenu);
-
-function updateMobileMenu() {
-  mobileTabsContainer.innerHTML = '';
-  document.querySelectorAll('header.topbar nav.topbar-nav a').forEach(a => {
-    const mobileLink = document.createElement('a');
-    mobileLink.href = a.href;
-    mobileLink.innerText = a.innerText;
-    mobileLink.className = a.className;
-    mobileLink.onclick = e => {
-      e.preventDefault();
-      document.querySelectorAll('.topbar-nav a').forEach(tab => tab.classList.remove('active-tab'));
-      a.classList.add('active-tab');
-      closeMenu();
-      const mdFile = a.getAttribute('data-md');
-      if (mdFile) renderMarkdown(mdFile);
-      else renderMarkdown('README.md');
-    };
-    mobileTabsContainer.appendChild(mobileLink);
-  });
-}
-
-function addMobileToggle() {
-  document.querySelectorAll('.nav-toggle-btn').forEach(el => el.remove());
-  if (window.innerWidth <= 1000) {
-    updateMobileMenu();
-    const navBtn = document.createElement('button');
-    navBtn.className = 'nav-toggle-btn';
-    navBtn.textContent = '☰';
-    navBtn.onclick = openMenu;
-    const topbar = document.querySelector('.topbar');
-    topbar.insertBefore(navBtn, topbar.querySelector('.topbar-actions'));
-  }
-}
-window.addEventListener('resize', addMobileToggle);
-addMobileToggle();
-
-/* ------- Navigation & initial load ------- */
+/* Navigation */
 document.getElementById('homeBtn').addEventListener('click', e => {
   e.preventDefault();
   document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
@@ -443,12 +292,10 @@ document.querySelectorAll('.page-link').forEach(link => {
     e.preventDefault();
     document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
     link.classList.add('active-tab');
-    const mdFile = link.getAttribute('data-md');
-    if (mdFile) renderMarkdown(mdFile);
+    renderMarkdown(link.getAttribute('data-md'));
   });
 });
 
-// Initial load
 renderMarkdown('README.md');
 </script>
 </body>
