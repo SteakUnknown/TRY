@@ -1,261 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Markdown Viewer with Lua + Copy Button + Footer + Topbar</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentation</title>
+<link rel="icon" href="documentation.png" type="image/png">
 
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
+<link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+<link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      font-family: system-ui, sans-serif;
-      background: #f5f5f5;
-    }
+<style>
+html, body {
+  margin:0; padding:0; font-family:system-ui,sans-serif;
+  transition: background 0.3s, color 0.3s;
+  overflow-x: hidden; 
+}
+body {
+  display:flex; flex-direction:column; min-height:100vh;
+  background:#f5f5f5; color:#24292e;
+}
 
-    /* --- TOPBAR --- */
-    header.topbar {
-      background-color: #24292e;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 3.5rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
+header.topbar {
+  background:#24292e; color:white; display:flex;
+  justify-content:space-between; align-items:center;
+  padding:0 2rem; height:5rem; position:sticky;
+  top:0; z-index:100; box-shadow:0 2px 4px rgba(0,0,0,0.1);
+}
+header.topbar .logo { font-weight:700; font-size:1.5rem; user-select:none; }
+nav.topbar-nav { display:flex; gap:1.5rem; }
+nav.topbar-nav a {
+  color:#c9d1d9; text-decoration:none; font-weight:500;
+  font-size:1.1rem; padding:0.25rem 0.5rem;
+  border-radius:4px; transition: background 0.2s,color 0.2s;
+}
+nav.topbar-nav a:hover { background:#444c56; color:white; }
+.topbar-actions { display:flex; gap:1rem; align-items:center; }
+.mode-toggle {
+  background:#eaecef; border:none; border-radius:4px;
+  padding:0.4rem 0.7rem; cursor:pointer; font-weight:bold;
+}
 
-    header.topbar .logo {
-      font-weight: 700;
-      font-size: 1.25rem;
-      user-select: none;
-    }
+/* Mobile toggle button */
+.nav-toggle-btn {
+  background:#444c56; color:white; border:none;
+  padding:0.3rem 0.6rem; border-radius:4px;
+  cursor:pointer; font-size:0.9rem;
+}
+.nav-toggle-btn:hover { background:#57606a; }
 
-    nav.topbar-nav {
-      display: flex;
-      gap: 1.5rem;
-    }
+.main-container {
+  display:flex; max-width:1200px; margin:2rem auto; flex:1; gap:2rem;
+}
+.markdown-body {
+  flex:1; background:#fff; padding:2rem; border-radius:8px;
+  box-shadow:0 0 10px rgba(0,0,0,0.05);
+  transition:background 0.3s,color 0.3s;
+  width:100%;
+  box-sizing:border-box;
+  overflow-x:auto;
+}
+.markdown-body pre {
+  white-space:pre-wrap; word-wrap:break-word;
+  overflow-x:auto;
+}
+.code-block-wrapper { position:relative; margin:1.5em 0; }
+.markdown-body pre code {
+  display:block; padding:1em; border-radius:6px;
+  font-family:"Fira Code", monospace;
+  font-size:0.95em; line-height:1.5;
+  background-color:#f6f8fa; color:#24292e;
+  transition:background 0.3s,color 0.3s;
+}
+.copy-btn {
+  position: absolute;
+  top:0.5em; right:0.5em;
+  padding:0.2em 0.5em;
+  font-size:0.75em;
+  border-radius:4px;
+  cursor:pointer;
+  background:#eaecef;
+  color:#24292e;
+  border:none;
+  transition:0.3s;
+  opacity:1;
+}
 
-    nav.topbar-nav a {
-      color: #c9d1d9;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 1rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    }
+/* Desktop hover */
+@media(min-width:1001px) {
+  .code-block-wrapper .copy-btn {
+    opacity:0;
+  }
+  .code-block-wrapper:hover .copy-btn {
+    opacity:1;
+  }
+}
 
-    nav.topbar-nav a:hover,
-    nav.topbar-nav a:focus {
-      background-color: #444c56;
-      color: white;
-      outline: none;
-    }
+/* Markdown responsiveness */
+.markdown-body img, 
+.markdown-body table,
+.markdown-body pre,
+.markdown-body code {
+  max-width:100%;
+  display:block;
+  overflow-x:auto;
+}
+.markdown-body img {
+  height:auto;
+}
 
-    /* --- MAIN CONTENT --- */
-    .markdown-body {
-      max-width: 800px;
-      margin: 2rem auto 0 auto;
-      background: #ffffff;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-      flex: 1;
-    }
+/* Mobile popup */
+.menu-overlay {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 900;
+}
+.menu-overlay.active { opacity:1; pointer-events:auto; }
 
-    .markdown-body h1, h2, h3 {
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.3em;
-    }
+.menu-popup {
+  position: fixed; top:5rem; right:0;
+  width:80%; max-width:300px;
+  height:calc(100vh - 5rem);
+  background:#fff; border-left:1px solid #ddd;
+  box-shadow:-2px 0 5px rgba(0,0,0,0.2);
+  transform:translateX(100%);
+  transition: transform 0.3s ease;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+  padding:1rem;
+}
+.menu-popup.open { transform:translateX(0); }
 
-    .markdown-body p code {
-      font-family: monospace;
-      background-color: #f0f0f0;
-      padding: 0.2em 0.4em;
-      border-radius: 4px;
-      font-size: 0.95em;
-    }
+/* Popup links stacked vertically */
+.menu-popup a {
+  display:block;
+  margin-bottom:1rem;
+  font-size:1.1rem;
+  text-decoration:none;
+  color:#0366d6;
+}
+.menu-popup a:hover { text-decoration:underline; }
 
-    .code-block-wrapper {
-      position: relative;
-      margin: 1.5em 0;
-    }
+/* Dark mode */
+body.dark-mode { background:#121212; color:#e0e0e0; }
+body.dark-mode .markdown-body { background:#1c1c1c; color:#e0e0e0; }
+body.dark-mode a { color:#58a6ff; }
+body.dark-mode .markdown-body pre code { background:#2c2c2c; color:#f5f5f5; }
+body.dark-mode .copy-btn { background:#444c56; color:#e0e0e0; }
+body.dark-mode .copy-btn.copied { background:#28a745; color:white; }
+body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
+body.dark-mode .menu-popup a { color:#3399ff; }
 
-    .markdown-body pre {
-      padding: 0;
-      margin: 0;
-    }
+footer {
+  background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%);
+  text-align:center; padding:30px 0;
+  margin-top:auto;
+}
 
-    .markdown-body pre code {
-      display: block;
-      overflow-x: auto;
-      padding: 1em;
-      background-color: #f6f8fa;
-      color: #24292e;
-      border-radius: 6px;
-      font-family: "Fira Code", monospace;
-      font-size: 0.95em;
-      line-height: 1.5;
-    }
+/* GitHub button */
+footer .github-link {
+  display:inline-block;
+  padding:12px 28px;
+  background:#2da44e;
+  color:white;
+  font-size:1.1rem;
+  font-weight:600;
+  text-decoration:none;
+  border-radius:8px;
+  box-shadow:0 4px 6px rgba(0,0,0,0.15);
+  transition:background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+footer .github-link:hover {
+  background:#2c974b;
+  transform:translateY(-3px);
+  box-shadow:0 6px 10px rgba(0,0,0,0.2);
+}
+footer .github-link:active {
+  background:#298e46;
+  transform:translateY(0);
+  box-shadow:0 3px 5px rgba(0,0,0,0.15);
+}
 
-    .hljs {
-      background: transparent;
-    }
+/* 🌙 Dark Mode GitHub button */
+body.dark-mode footer {
+  background:linear-gradient(180deg,#0d1117 0%,#010409 100%);
+}
+body.dark-mode footer .github-link {
+  background:#238636;
+  color:#f0f6fc;
+  box-shadow:0 4px 6px rgba(0,0,0,0.5);
+}
+body.dark-mode footer .github-link:hover {
+  background:#2ea043;
+  box-shadow:0 6px 10px rgba(0,0,0,0.6);
+}
+body.dark-mode footer .github-link:active {
+  background:#196c2e;
+  box-shadow:0 3px 5px rgba(0,0,0,0.5);
+}
 
-    .hljs-keyword { color: #d73a49; font-weight: bold; }
-    .hljs-string  { color: #032f62; }
-    .hljs-comment { color: #6a737d; font-style: italic; }
-    .hljs-number  { color: #005cc5; }
-    .hljs-function .hljs-title { color: #6f42c1; }
-
-    .copy-btn {
-      position: absolute;
-      top: 0.5em;
-      right: 0.5em;
-      padding: 0.2em 0.5em;
-      font-size: 0.75em;
-      background: #eaecef;
-      color: #24292e;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      opacity: 0.6;
-      transition: opacity 0.2s ease-in-out;
-    }
-
-    .copy-btn:hover {
-      opacity: 1;
-    }
-
-    .copy-btn.copied {
-      background: #28a745;
-      color: white;
-    }
-
-    /* --- FOOTER --- */
-    .site-footer {
-      background-color: #1e1e1e;
-      padding: 2em 1em;
-      text-align: center;
-      font-size: 0.95em;
-      color: #ccc;
-      margin-top: 2rem;
-    }
-
-    .site-footer a {
-      color: #ccc;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .site-footer a:hover {
-      color: #fff;
-      text-decoration: underline;
-    }
-
-    .site-footer p {
-      margin: 0;
-      line-height: 1.6;
-    }
-  </style>
+/* Responsive adjustments for mobile */
+@media(max-width:1000px) {
+  nav.topbar-nav { display:none; } /* hide topbar links on mobile */
+  .main-container {
+    flex-direction: column;
+    margin: 1rem;
+    gap: 1rem;
+    max-width: 100%;
+  }
+  .markdown-body {
+    padding: 1rem;
+    max-width: 100%;
+  }
+}
+</style>
 </head>
 <body>
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div class="logo">Document Creator</div>
-    <nav class="topbar-nav" role="navigation" aria-label="Primary">
-      <a href="#" tabindex="0">Home</a>
-      <a href="#" tabindex="0">About</a>
-      <a href="#" tabindex="0">Create Document</a>
-    </nav>
-  </header>
 
-  <!-- Main content -->
+<header class="topbar">
+  <div class="logo">Document Creator</div>
+  <nav class="topbar-nav">
+    <a href="#" id="homeBtn" class="active-tab">Home</a>
+    <a href="#" data-md="about.md" class="page-link">About</a>
+  </nav>
+  <div class="topbar-actions">
+    <button class="mode-toggle" id="modeToggle">Dark Mode</button>
+  </div>
+</header>
+
+<div class="main-container">
   <div class="markdown-body" id="content">Loading markdown...</div>
+</div>
 
-  <!-- NOTE: Footer will be dynamically inserted here after markdown loads -->
+<!-- Mobile overlay & popup -->
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="menu-popup" id="menuPopup">
+  <div id="mobileTabsContainer"></div>
+</div>
 
-  <!-- Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
+<footer>
+  <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer" class="github-link">
+    View this project on GitHub →
+  </a>
+</footer>
 
-  <script>
-    // Configure marked to use highlight.js
-    marked.setOptions({
-      highlight: function(code, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-          return hljs.highlight(code, { language: lang }).value;
-        }
-        return hljs.highlightAuto(code).value;
-      }
-    });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
 
-    // Load and render markdown
-    fetch('README.md?cache=' + Date.now())
-      .then(response => {
-        if (!response.ok) throw new Error("Could not load README.md");
-        return response.text();
-      })
-      .then(markdown => {
-        const html = marked.parse(markdown);
-        const container = document.getElementById('content');
-        container.innerHTML = html;
+<script>
+const hljsLight = document.getElementById('hljs-light');
+const hljsDark = document.getElementById('hljs-dark');
+const menuPopup = document.getElementById('menuPopup');
+const menuOverlay = document.getElementById('menuOverlay');
+const mobileTabsContainer = document.getElementById('mobileTabsContainer');
 
-        // Wrap code blocks with copy button
-        const codeBlocks = container.querySelectorAll('pre > code');
-        codeBlocks.forEach(code => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block-wrapper';
+// Markdown rendering
+function renderMarkdown(mdFile) {
+  fetch(mdFile + '?cache=' + Date.now())
+    .then(r => r.ok ? r.text() : Promise.reject())
+    .catch(() => `# Error\n\nCould not load ${mdFile}`)
+    .then(markdown => {
+      const container = document.getElementById('content');
+      container.innerHTML = marked.parse(markdown);
 
-          const pre = code.parentElement;
-          pre.parentElement.insertBefore(wrapper, pre);
-          wrapper.appendChild(pre);
+      container.querySelectorAll('pre > code').forEach(code => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'code-block-wrapper';
+        const pre = code.parentElement;
+        pre.parentElement.insertBefore(wrapper, pre);
+        wrapper.appendChild(pre);
 
-          const button = document.createElement('button');
-          button.className = 'copy-btn';
-          button.innerText = 'Copy';
-          button.addEventListener('click', () => {
-            navigator.clipboard.writeText(code.innerText).then(() => {
-              button.classList.add('copied');
-              button.innerText = 'Copied!';
-              setTimeout(() => {
-                button.innerText = 'Copy';
-                button.classList.remove('copied');
-              }, 1500);
-            });
-          });
-
-          wrapper.appendChild(button);
-        });
-
-        hljs.highlightAll();
-
-        // Now add the footer dynamically AFTER markdown loaded
-        const footer = document.createElement('footer');
-        footer.className = 'site-footer';
-        footer.innerHTML = `
-          <p>
-            <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer">
-              View this project on GitHub →
-            </a>
-          </p>
-        `;
-        document.body.appendChild(footer);
-      })
-      .catch(err => {
-        document.getElementById('content').innerHTML =
-          `<p style="color:red;">Error: ${err.message}</p>`;
+        const button = document.createElement('button');
+        button.className = 'copy-btn';
+        button.innerText = 'Copy';
+        button.onclick = () => {
+          navigator.clipboard.writeText(code.innerText);
+          button.classList.add('copied');
+          button.innerText = 'Copied!';
+          setTimeout(() => { button.classList.remove('copied'); button.innerText = 'Copy'; }, 1500);
+        };
+        wrapper.appendChild(button);
       });
-  </script>
+
+      hljs.highlightAll();
+    });
+}
+
+// Dark mode
+function setMode(isDark) {
+  document.body.classList.toggle('dark-mode', isDark);
+  hljsLight.disabled = isDark;
+  hljsDark.disabled = !isDark;
+  localStorage.setItem('mode', isDark ? 'dark' : 'light');
+  document.getElementById('modeToggle').innerText = isDark ? 'Light Mode' : 'Dark Mode';
+}
+const savedMode = localStorage.getItem('mode');
+setMode(savedMode === 'dark');
+document.getElementById('modeToggle').addEventListener('click', () => {
+  setMode(!document.body.classList.contains('dark-mode'));
+});
+
+// Mobile menu functions
+function openMenu() {
+  menuPopup.classList.add('open');
+  menuOverlay.classList.add('active');
+}
+function closeMenu() {
+  menuPopup.classList.remove('open');
+  menuOverlay.classList.remove('active');
+}
+menuOverlay.addEventListener('click', closeMenu);
+
+// Populate mobile popup with links
+function updateMobileMenu() {
+  mobileTabsContainer.innerHTML = '';
+  document.querySelectorAll('header.topbar nav.topbar-nav a').forEach(a => {
+    const mobileLink = document.createElement('a');
+    mobileLink.href = a.href;
+    mobileLink.innerText = a.innerText;
+    mobileLink.className = a.className;
+    mobileLink.onclick = e => {
+      e.preventDefault();
+      document.querySelectorAll('.topbar-nav a').forEach(tab => tab.classList.remove('active-tab'));
+      a.classList.add('active-tab');
+      closeMenu();
+      const mdFile = a.getAttribute('data-md');
+      if(mdFile) renderMarkdown(mdFile);
+      else renderMarkdown('README.md');
+    };
+    mobileTabsContainer.appendChild(mobileLink);
+  });
+}
+
+// Add mobile toggle button
+function addMobileToggle() {
+  document.querySelectorAll('.nav-toggle-btn').forEach(el => el.remove());
+
+  if (window.innerWidth <= 1000) {
+    updateMobileMenu();
+    const navBtn = document.createElement('button');
+    navBtn.className = 'nav-toggle-btn';
+    navBtn.textContent = '☰';
+    navBtn.onclick = openMenu;
+    const topbar = document.querySelector('.topbar');
+    topbar.insertBefore(navBtn, topbar.querySelector('.topbar-actions'));
+  }
+}
+window.addEventListener('resize', addMobileToggle);
+addMobileToggle();
+
+// Load home page
+document.getElementById('homeBtn').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
+  e.target.classList.add('active-tab');
+  renderMarkdown('README.md');
+});
+document.querySelectorAll('.page-link').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
+    link.classList.add('active-tab');
+    const mdFile = link.getAttribute('data-md');
+    if(mdFile) renderMarkdown(mdFile);
+  });
+});
+
+// Initial load
+renderMarkdown('README.md');
+</script>
 </body>
 </html>
