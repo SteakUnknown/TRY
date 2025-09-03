@@ -10,110 +10,88 @@
 <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 
 <style>
-  html, body {
-    margin:0; padding:0; font-family:system-ui, sans-serif;
-    transition: background 0.3s, color 0.3s;
-    overflow-x:hidden;
-  }
-  body {
-    display:flex; flex-direction:column; min-height:100vh;
-    background:#f5f5f5; color:#24292e;
-  }
+  html, body { margin:0; padding:0; font-family:system-ui, sans-serif; }
+  body { display:flex; flex-direction:column; min-height:100vh; background:#f5f5f5; color:#24292e; }
 
   /* Topbar */
   header.topbar {
     background:#24292e; color:white; display:flex;
     justify-content:space-between; align-items:center;
-    padding:0 2rem; height:5rem; position:sticky; top:0; z-index:100;
-    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    padding:0 1rem; height:4rem; position:sticky; top:0; z-index:100;
   }
-  header.topbar .logo { font-weight:700; font-size:1.5rem; user-select:none; }
-  nav.topbar-nav { display:flex; gap:1.5rem; }
-  nav.topbar-nav a {
-    color:#c9d1d9; text-decoration:none; font-weight:500;
-    font-size:1.1rem; padding:0.25rem 0.5rem; border-radius:4px;
-    transition: background 0.2s, color 0.2s;
-  }
+  header.topbar .logo { font-weight:700; font-size:1.2rem; user-select:none; }
+  nav.topbar-nav { display:flex; gap:1rem; }
+  nav.topbar-nav a { color:#c9d1d9; text-decoration:none; font-weight:500; padding:0.25rem 0.5rem; border-radius:4px; }
   nav.topbar-nav a:hover { background:#444c56; color:white; }
-  .topbar-actions { display:flex; gap:1rem; align-items:center; }
-  .mode-toggle {
-    background:#eaecef; border:none; border-radius:4px;
-    padding:0.4rem 0.7rem; cursor:pointer; font-weight:bold;
-  }
+  .topbar-actions { display:flex; gap:0.5rem; align-items:center; }
+  .mode-toggle { background:#eaecef; border:none; border-radius:4px; padding:0.3rem 0.6rem; cursor:pointer; }
 
-  /* Layout */
-  .main-container { display:flex; max-width:1200px; margin:2rem auto; flex:1; gap:2rem; }
+  /* Mobile nav */
+  .nav-toggle-btn {
+    display:none; background:#444c56; color:white; border:none;
+    padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer;
+  }
+  .nav-toggle-btn:hover { background:#57606a; }
+  .menu-overlay {
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.3); opacity:0; pointer-events:none;
+    transition:opacity 0.3s ease; z-index:900;
+  }
+  .menu-overlay.active { opacity:1; pointer-events:auto; }
+  .menu-popup {
+    position:fixed; top:4rem; right:0; width:80%; max-width:300px;
+    height:calc(100vh - 4rem); background:#fff; border-left:1px solid #ddd;
+    transform:translateX(100%); transition:transform 0.3s ease; z-index:1000;
+    display:flex; flex-direction:column; padding:1rem;
+  }
+  .menu-popup.open { transform:translateX(0); }
+  .menu-popup a { margin-bottom:1rem; color:#0366d6; text-decoration:none; font-size:1.1rem; }
+  .menu-popup a:hover { text-decoration:underline; }
+
+  /* Content */
+  .main-container { flex:1; max-width:1200px; margin:1rem auto; width:100%; }
   .markdown-body {
-    flex:1; background:#fff; padding:2rem; border-radius:8px;
+    background:#fff; padding:1rem; border-radius:8px;
     box-shadow:0 0 10px rgba(0,0,0,0.05);
-    transition:background 0.3s, color 0.3s;
-    width:100%; box-sizing:border-box; overflow-x:auto;
+    overflow-x:auto;
   }
-
-  /* Code blocks */
   .code-block-wrapper { position:relative; margin:1.5em 0; }
   .markdown-body pre { margin:0; overflow:auto; }
-  .markdown-body pre code{
-    display:block; border-radius:6px;
-    font-family:"Fira Code", monospace;
-    font-size:0.95em; line-height:1.5;
+  .markdown-body pre code {
+    display:block; padding:1em 3.5em 1em 1em; border-radius:6px;
+    font-family:"Fira Code", monospace; font-size:0.95em;
     background:#f6f8fa; color:#24292e;
-    padding:1em 3.5em 1em 1em; /* extra right padding so button doesn't cover code */
-    transition:background 0.3s, color 0.3s;
-    white-space:pre; /* preserve formatting; allow horizontal scroll in <pre> */
   }
 
-  /* Floating copy button (fixed to viewport; we position to block's visible corner) */
-  .floating-copy-btn{
-    position:fixed;
-    top:-9999px; left:-9999px;
-    z-index:1100;
-    padding:0.35rem 0.6rem;
-    font-size:0.8rem;
-    border-radius:6px;
-    cursor:pointer;
-    background:#eaecef; color:#24292e; border:none;
+  /* Floating copy button */
+  .floating-copy-btn {
+    position:fixed; top:-9999px; left:-9999px; z-index:1100;
+    padding:0.35rem 0.6rem; font-size:0.8rem;
+    border-radius:6px; cursor:pointer; background:#eaecef; border:none;
     box-shadow:0 2px 6px rgba(0,0,0,0.15);
     opacity:0; pointer-events:none;
-    transition:opacity 0.15s ease, transform 0.05s ease;
+    transition:opacity 0.15s ease;
   }
-  .floating-copy-btn.show { opacity:1; pointer-events:auto; }
-  .floating-copy-btn.always-visible { opacity:1 !important; pointer-events:auto !important; }
-  .floating-copy-btn:hover { background:#d0d7de; }
+  .floating-copy-btn.show, .floating-copy-btn.always-visible { opacity:1; pointer-events:auto; }
   .floating-copy-btn.copied { background:#28a745; color:white; }
 
   /* Footer */
-  footer {
-    background:linear-gradient(180deg,#1e1e1e 0%,#121212 100%);
-    text-align:center; padding:30px 0; margin-top:auto;
-  }
-  footer .github-link{
+  footer { background:#1e1e1e; text-align:center; padding:20px; margin-top:auto; }
+  footer .github-link {
     display:inline-block; padding:12px 28px; background:#2da44e; color:white;
     font-size:1.1rem; font-weight:600; text-decoration:none; border-radius:8px;
-    box-shadow:0 4px 6px rgba(0,0,0,0.15);
-    transition:background 0.2s, transform 0.1s, box-shadow 0.2s;
+    transition:background 0.2s, transform 0.1s;
   }
-  footer .github-link:hover{ background:#2c974b; transform:translateY(-3px); box-shadow:0 6px 10px rgba(0,0,0,0.2); }
-  footer .github-link:active{ background:#298e46; transform:translateY(0); box-shadow:0 3px 5px rgba(0,0,0,0.15); }
+  footer .github-link:hover { background:#2c974b; transform:translateY(-2px); }
 
   /* Dark mode */
-  body.dark-mode{ background:#121212; color:#e0e0e0; }
-  body.dark-mode .markdown-body{ background:#1c1c1c; color:#e0e0e0; }
-  body.dark-mode a{ color:#58a6ff; }
-  body.dark-mode .markdown-body pre code{ background:#2c2c2c; color:#f5f5f5; }
-  body.dark-mode .floating-copy-btn{ background:#444c56; color:#e0e0e0; }
-  body.dark-mode .floating-copy-btn.copied{ background:#28a745; color:white; }
-  body.dark-mode footer{ background:linear-gradient(180deg,#0d1117 0%,#010409 100%); }
-  body.dark-mode footer .github-link{ background:#238636; color:#f0f6fc; box-shadow:0 4px 6px rgba(0,0,0,0.5); }
-  body.dark-mode footer .github-link:hover{ background:#2ea043; box-shadow:0 6px 10px rgba(0,0,0,0.6); }
-  body.dark-mode footer .github-link:active{ background:#196c2e; box-shadow:0 3px 5px rgba(0,0,0,0.5); }
-
-  /* Mobile layout */
-  @media(max-width:1000px){
-    nav.topbar-nav{ display:none; }
-    .main-container{ flex-direction:column; margin:1rem; gap:1rem; max-width:100%; }
-    .markdown-body{ padding:1rem; max-width:100%; }
-  }
+  body.dark-mode { background:#121212; color:#e0e0e0; }
+  body.dark-mode .markdown-body { background:#1c1c1c; }
+  body.dark-mode .markdown-body pre code { background:#2c2c2c; color:#f5f5f5; }
+  body.dark-mode .floating-copy-btn { background:#444c56; color:#e0e0e0; }
+  body.dark-mode .floating-copy-btn.copied { background:#28a745; color:white; }
+  body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
+  body.dark-mode .menu-popup a { color:#58a6ff; }
 </style>
 </head>
 <body>
@@ -125,6 +103,7 @@
     <a href="#" data-md="about.md" class="page-link">About</a>
   </nav>
   <div class="topbar-actions">
+    <button class="nav-toggle-btn" id="navToggle">☰</button>
     <button class="mode-toggle" id="modeToggle">Dark Mode</button>
   </div>
 </header>
@@ -133,14 +112,16 @@
   <div class="markdown-body" id="content">Loading markdown...</div>
 </div>
 
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="menu-popup" id="menuPopup"></div>
+
 <footer>
   <a href="https://github.com/speedetoon/test" target="_blank" rel="noopener noreferrer" class="github-link">
     View this project on GitHub →
   </a>
 </footer>
 
-<!-- One floating copy button reused for all blocks -->
-<button id="floatingCopyBtn" class="floating-copy-btn" type="button" aria-label="Copy code">Copy</button>
+<button id="floatingCopyBtn" class="floating-copy-btn">Copy</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -148,235 +129,127 @@
 
 <script>
 (() => {
-  const hljsLight = document.getElementById('hljs-light');
-  const hljsDark  = document.getElementById('hljs-dark');
   const floatingBtn = document.getElementById('floatingCopyBtn');
+  const menuPopup = document.getElementById('menuPopup');
+  const menuOverlay = document.getElementById('menuOverlay');
+  const navToggle = document.getElementById('navToggle');
+  const hljsLight = document.getElementById('hljs-light');
+  const hljsDark = document.getElementById('hljs-dark');
+  let activeWrapper = null, activeCodeEl = null, overBtn = false;
 
-  let activeWrapper = null;
-  let activeCodeEl  = null;
-  let hideTimer = null;
-  let overBtn = false; // prevents hiding when moving from block to button
-  let io = null;       // IntersectionObserver for mobile
-  const MOBILE_MAX = 1000;
-
-  /* ---------- Markdown render & wrap code blocks ---------- */
-  function renderMarkdown(mdFile) {
-    fetch(mdFile + '?cache=' + Date.now())
-      .then(r => r.ok ? r.text() : Promise.reject(new Error('Failed to load ' + mdFile)))
-      .then(markdown => {
-        const container = document.getElementById('content');
-        container.innerHTML = marked.parse(markdown);
-
-        // Wrap each <pre><code> in a .code-block-wrapper
-        const codeBlocks = container.querySelectorAll('pre > code');
-        codeBlocks.forEach(code => {
-          const pre = code.parentElement;
-          const wrapper = document.createElement('div');
-          wrapper.className = 'code-block-wrapper';
-          pre.parentElement.insertBefore(wrapper, pre);
-          wrapper.appendChild(pre);
-
-          // Desktop hover handling
-          wrapper.addEventListener('mouseenter', () => setActiveWrapper(wrapper, code, true));
-          wrapper.addEventListener('mousemove', () => setActiveWrapper(wrapper, code, true));
-          wrapper.addEventListener('mouseleave', onWrapperLeave);
-
-          // Mobile activation by touch
-          wrapper.addEventListener('touchstart', () => setActiveWrapper(wrapper, code, false), {passive:true});
-        });
-
-        // Syntax highlight
-        hljs.highlightAll();
-
-        // Setup/refresh mobile observer
-        setupMobileObserver();
-      })
-      .catch(err => {
-        document.getElementById('content').innerHTML =
-          `<p style="color:red">Error: ${err.message}</p>`;
-      });
+  /* Helpers */
+  function isMobile() {
+    return window.innerWidth <= 1000 || ('ontouchstart' in window);
   }
 
-  /* ---------- Active block management ---------- */
-  function setActiveWrapper(wrapper, codeEl, isHover) {
+  /* Mobile nav */
+  function openMenu() {
+    menuPopup.classList.add('open');
+    menuOverlay.classList.add('active');
+  }
+  function closeMenu() {
+    menuPopup.classList.remove('open');
+    menuOverlay.classList.remove('active');
+  }
+  navToggle.addEventListener('click', openMenu);
+  menuOverlay.addEventListener('click', closeMenu);
+
+  function updateMenuLinks() {
+    menuPopup.innerHTML = '';
+    document.querySelectorAll('header.topbar nav.topbar-nav a').forEach(a => {
+      const link = document.createElement('a');
+      link.href = a.href;
+      link.textContent = a.textContent;
+      link.onclick = e => {
+        e.preventDefault();
+        closeMenu();
+        a.click(); // trigger desktop logic
+      };
+      menuPopup.appendChild(link);
+    });
+  }
+
+  /* Copy logic */
+  floatingBtn.addEventListener('click', async () => {
+    if (!activeCodeEl) return;
+    try {
+      await navigator.clipboard.writeText(activeCodeEl.textContent);
+      floatingBtn.classList.add('copied');
+      floatingBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        floatingBtn.classList.remove('copied');
+        floatingBtn.textContent = 'Copy';
+      }, 1500);
+    } catch {}
+  });
+  floatingBtn.addEventListener('mouseenter', () => overBtn = true);
+  floatingBtn.addEventListener('mouseleave', () => overBtn = false);
+
+  function setActive(wrapper, code) {
     activeWrapper = wrapper;
-    activeCodeEl  = codeEl;
-
-    // On mobile, always visible; on desktop, show on hover only
-    if (isMobile()) {
-      floatingBtn.classList.add('always-visible');
-      floatingBtn.classList.remove('show');
-    } else {
-      floatingBtn.classList.add('show');
-      floatingBtn.classList.remove('always-visible');
-    }
-
-    positionFloatingBtn();
+    activeCodeEl = code;
+    floatingBtn.classList.add(isMobile() ? 'always-visible' : 'show');
+    positionBtn();
   }
 
-  function onWrapperLeave() {
-    if (isMobile()) return; // mobile stays visible while in view (IO controls hide)
-
-    // Delay hide so user can move into the button
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(() => {
-      if (!overBtn) {
-        floatingBtn.classList.remove('show');
-        activeWrapper = null;
-        activeCodeEl = null;
-      }
-    }, 120);
-  }
-
-  /* ---------- Positioning (relative to viewport) ---------- */
-  function positionFloatingBtn() {
+  function positionBtn() {
     if (!activeWrapper) return;
-
     const rect = activeWrapper.getBoundingClientRect();
     const btnRect = floatingBtn.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-
-    // If active block is off-screen, hide (mobile observer may pick another)
-    if (rect.bottom <= 0 || rect.top >= vh || rect.right <= 0 || rect.left >= vw) {
-      if (isMobile()) {
-        floatingBtn.classList.remove('always-visible');
-      } else {
-        floatingBtn.classList.remove('show');
-      }
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (rect.bottom <= 0 || rect.top >= vh) {
+      floatingBtn.classList.remove('show', 'always-visible');
       return;
     }
-
-    // Clamp to visible top-right corner of the block
-    const visibleRight = Math.min(rect.right, vw);
-    const visibleTop   = Math.max(rect.top, 0);
-
-    const left = Math.max(visibleRight - btnRect.width - 8, Math.max(rect.left + 8, 8));
-    const top  = Math.min(
-      Math.max(visibleTop + 8, 8),
-      rect.bottom - btnRect.height - 8
-    );
-
+    const left = Math.min(rect.right, vw) - btnRect.width - 8;
+    const top = Math.max(rect.top, 0) + 8;
     floatingBtn.style.left = left + 'px';
-    floatingBtn.style.top  = top  + 'px';
+    floatingBtn.style.top = top + 'px';
   }
 
-  /* ---------- Copy logic (with fallback) ---------- */
-  async function copyActiveCode() {
-    if (!activeCodeEl) return;
-    const text = activeCodeEl.textContent;
-
-    try {
-      await navigator.clipboard.writeText(text);
-      showCopiedState();
-    } catch(e) {
-      // Fallback for older browsers / blocked clipboard
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.top = '-1000px';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      try {
-        const ok = document.execCommand('copy');
-        document.body.removeChild(ta);
-        if (ok) showCopiedState();
-      } catch(e2) {
-        document.body.removeChild(ta);
-      }
-    }
-  }
-
-  function showCopiedState() {
-    const original = floatingBtn.textContent;
-    floatingBtn.classList.add('copied');
-    floatingBtn.textContent = 'Copied!';
-    setTimeout(() => {
-      floatingBtn.classList.remove('copied');
-      floatingBtn.textContent = original;
-    }, 1500);
-  }
-
-  /* ---------- Mobile: keep button while a block is in view ---------- */
-  function setupMobileObserver() {
-    if (io) { io.disconnect(); io = null; }
-    if (!isMobile()) return;
-
-    const wrappers = document.querySelectorAll('.code-block-wrapper');
-    if (!wrappers.length) {
-      floatingBtn.classList.remove('always-visible');
-      return;
-    }
-
-    const ratios = new Map();
-    io = new IntersectionObserver((entries) => {
-      entries.forEach(entry => ratios.set(entry.target, entry.intersectionRatio));
-
-      // Pick the most visible block
-      let best = null, bestRatio = 0;
-      ratios.forEach((ratio, el) => {
-        if (ratio > bestRatio) { best = el; bestRatio = ratio; }
+  /* Markdown */
+  function renderMarkdown(mdFile) {
+    fetch(mdFile + '?cache=' + Date.now())
+      .then(r => r.text())
+      .then(md => {
+        const container = document.getElementById('content');
+        container.innerHTML = marked.parse(md);
+        container.querySelectorAll('pre > code').forEach(code => {
+          const pre = code.parentElement;
+          const wrap = document.createElement('div');
+          wrap.className = 'code-block-wrapper';
+          pre.parentElement.insertBefore(wrap, pre);
+          wrap.appendChild(pre);
+          wrap.addEventListener('mouseenter', () => !isMobile() && setActive(wrap, code));
+          wrap.addEventListener('mousemove', () => !isMobile() && setActive(wrap, code));
+          wrap.addEventListener('mouseleave', () => { if (!isMobile() && !overBtn) floatingBtn.classList.remove('show'); });
+          wrap.addEventListener('touchstart', () => setActive(wrap, code), {passive:true});
+        });
+        hljs.highlightAll();
+        updateMenuLinks();
       });
-
-      if (best && bestRatio > 0) {
-        const codeEl = best.querySelector('pre > code');
-        setActiveWrapper(best, codeEl, false);
-      } else {
-        // none visible -> hide
-        floatingBtn.classList.remove('always-visible');
-        activeWrapper = null;
-        activeCodeEl = null;
-      }
-    }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
-
-    wrappers.forEach(w => io.observe(w));
   }
 
-  /* ---------- Dark mode ---------- */
-  function setMode(isDark) {
-    document.body.classList.toggle('dark-mode', isDark);
-    hljsLight.disabled = isDark;
-    hljsDark.disabled  = !isDark;
-    localStorage.setItem('mode', isDark ? 'dark' : 'light');
-    document.getElementById('modeToggle').innerText = isDark ? 'Light Mode' : 'Dark Mode';
+  /* Dark mode */
+  function setMode(dark) {
+    document.body.classList.toggle('dark-mode', dark);
+    hljsLight.disabled = dark; hljsDark.disabled = !dark;
+    document.getElementById('modeToggle').textContent = dark ? 'Light Mode' : 'Dark Mode';
+    localStorage.setItem('mode', dark ? 'dark' : 'light');
   }
-  const savedMode = localStorage.getItem('mode') === 'dark';
-  setMode(savedMode);
-  document.getElementById('modeToggle').addEventListener('click', () => {
-    setMode(!document.body.classList.contains('dark-mode'));
-  });
+  setMode(localStorage.getItem('mode') === 'dark');
+  document.getElementById('modeToggle').addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
 
-  /* ---------- Events ---------- */
-  // Keep shown when hovering the button itself (desktop)
-  floatingBtn.addEventListener('mouseenter', () => { overBtn = true; });
-  floatingBtn.addEventListener('mouseleave', () => { overBtn = false; });
+  /* Nav */
+  document.getElementById('homeBtn').addEventListener('click', e => { e.preventDefault(); renderMarkdown('README.md'); });
+  document.querySelectorAll('.page-link').forEach(link => link.addEventListener('click', e => { e.preventDefault(); renderMarkdown(link.dataset.md); }));
 
-  floatingBtn.addEventListener('click', copyActiveCode);
-  window.addEventListener('scroll', positionFloatingBtn, {passive:true});
-  window.addEventListener('resize', () => { positionFloatingBtn(); setupMobileObserver(); });
+  /* Events */
+  window.addEventListener('scroll', positionBtn, {passive:true});
+  window.addEventListener('resize', () => { positionBtn(); updateMenuLinks(); });
 
-  // Nav (optional pages)
-  document.getElementById('homeBtn').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
-    e.target.classList.add('active-tab');
-    renderMarkdown('README.md');
-  });
-  document.querySelectorAll('.page-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      document.querySelectorAll('.topbar-nav a').forEach(a => a.classList.remove('active-tab'));
-      link.classList.add('active-tab');
-      const mdFile = link.getAttribute('data-md');
-      if (mdFile) renderMarkdown(mdFile);
-    });
-  });
-
-  // Initial load
+  /* Init */
   renderMarkdown('README.md');
-
-  /* ---------- Helpers ---------- */
-  function isMobile(){ return window.innerWidth <= MOBILE_MAX; }
 })();
 </script>
 </body>
