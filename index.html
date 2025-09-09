@@ -30,15 +30,12 @@
   nav.topbar-nav { display:flex; gap:1rem; }
   nav.topbar-nav a { color:#c9d1d9; text-decoration:none; font-weight:500; padding:0.25rem 0.5rem; border-radius:4px; }
   nav.topbar-nav a:hover { background:#444c56; color:white; }
-  .topbar-actions { display:flex; gap:0.5rem; align-items:center; }
-  .mode-toggle { background:#eaecef; border:none; border-radius:4px; padding:0.3rem 0.6rem; cursor:pointer; }
 
-  .theme-selector {
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
-    cursor: pointer;
+  .topbar-actions { display:flex; gap:0.5rem; align-items:center; }
+  .mode-toggle, .theme-selector {
+    background:#eaecef; border:1px solid #ccc;
+    border-radius:4px; padding:0.3rem 0.6rem;
+    cursor:pointer; font-size:0.9rem;
   }
 
   /* Mobile nav */
@@ -58,6 +55,7 @@
     height:calc(100vh - 4rem); background:#fff; border-left:1px solid #ddd;
     transform:translateX(100%); transition:transform 0.3s ease; z-index:1000;
     display:flex; flex-direction:column; padding:1rem;
+    overflow-y:auto;
   }
   .menu-popup.open { transform:translateX(0); }
   .menu-popup a { margin-bottom:1rem; color:#0366d6; text-decoration:none; font-size:1.1rem; }
@@ -107,6 +105,13 @@
   body.dark-mode .floating-copy-btn.copied { background:#28a745; color:white; }
   body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
   body.dark-mode .menu-popup a { color:#58a6ff; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav.topbar-nav { display:none; } /* hide desktop nav */
+    .nav-toggle-btn { display:inline-block; }
+    .theme-selector, .mode-toggle { display:none; } /* hide in topbar */
+  }
 </style>
 </head>
 <body>
@@ -159,17 +164,41 @@
   const menuOverlay = document.getElementById('menuOverlay');
   const navToggle = document.getElementById('navToggle');
   const themeSelector = document.getElementById('themeSelector');
+  const modeToggle = document.getElementById('modeToggle');
   let activeWrapper = null, activeCodeEl = null, overBtn = false;
 
   /* Helpers */
   function isMobile() {
-    return window.innerWidth <= 1000 || ('ontouchstart' in window);
+    return window.innerWidth <= 768 || ('ontouchstart' in window);
   }
 
   /* Mobile nav */
   function openMenu() {
     menuPopup.classList.add('open');
     menuOverlay.classList.add('active');
+
+    // Add theme + mode toggle inside mobile menu
+    if (!document.getElementById('mobileThemeSelector')) {
+      const themeLabel = document.createElement('label');
+      themeLabel.textContent = "Code Theme:";
+      const mobileTheme = themeSelector.cloneNode(true);
+      mobileTheme.id = 'mobileThemeSelector';
+      mobileTheme.value = themeSelector.value;
+      mobileTheme.addEventListener('change', e => {
+        themeSelector.value = e.target.value;
+        setTheme(e.target.value);
+      });
+
+      const darkBtn = document.createElement('button');
+      darkBtn.textContent = modeToggle.textContent;
+      darkBtn.className = 'mode-toggle';
+      darkBtn.style.marginTop = '1rem';
+      darkBtn.onclick = () => modeToggle.click();
+
+      menuPopup.appendChild(themeLabel);
+      menuPopup.appendChild(mobileTheme);
+      menuPopup.appendChild(darkBtn);
+    }
   }
   function closeMenu() {
     menuPopup.classList.remove('open');
@@ -257,11 +286,11 @@
   /* Dark mode */
   function setMode(dark) {
     document.body.classList.toggle('dark-mode', dark);
-    document.getElementById('modeToggle').textContent = dark ? 'Light Mode' : 'Dark Mode';
+    modeToggle.textContent = dark ? 'Light Mode' : 'Dark Mode';
     localStorage.setItem('mode', dark ? 'dark' : 'light');
   }
   setMode(localStorage.getItem('mode') === 'dark');
-  document.getElementById('modeToggle').addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
+  modeToggle.addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
 
   /* Theme switching */
   function setTheme(themeId) {
@@ -269,6 +298,10 @@
     const theme = document.getElementById(themeId);
     if (theme) theme.disabled = false;
     localStorage.setItem('hljs-theme', themeId);
+
+    // Sync with mobile selector if exists
+    const mobileTheme = document.getElementById('mobileThemeSelector');
+    if (mobileTheme) mobileTheme.value = themeId;
   }
   themeSelector.addEventListener('change', e => setTheme(e.target.value));
 
