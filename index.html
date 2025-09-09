@@ -6,8 +6,15 @@
 <title>Documentation</title>
 <link rel="icon" href="documentation.png" type="image/png">
 
-<link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
-<link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<!-- Highlight.js Themes (preload 8) -->
+<link id="hljs-atom-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+<link id="hljs-atom-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
+<link id="hljs-github" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" disabled>
+<link id="hljs-github-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
+<link id="hljs-dracula" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dracula.min.css" disabled>
+<link id="hljs-monokai" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/monokai.min.css" disabled>
+<link id="hljs-solarized-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/solarized-light.min.css" disabled>
+<link id="hljs-solarized-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/solarized-dark.min.css" disabled>
 
 <style>
   html, body { margin:0; padding:0; font-family:system-ui, sans-serif; }
@@ -25,6 +32,14 @@
   nav.topbar-nav a:hover { background:#444c56; color:white; }
   .topbar-actions { display:flex; gap:0.5rem; align-items:center; }
   .mode-toggle { background:#eaecef; border:none; border-radius:4px; padding:0.3rem 0.6rem; cursor:pointer; }
+
+  .theme-selector {
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
 
   /* Mobile nav */
   .nav-toggle-btn {
@@ -104,6 +119,16 @@
   </nav>
   <div class="topbar-actions">
     <button class="nav-toggle-btn" id="navToggle">☰</button>
+    <select id="themeSelector" class="theme-selector">
+      <option value="hljs-atom-light">Atom One Light</option>
+      <option value="hljs-atom-dark">Atom One Dark</option>
+      <option value="hljs-github">GitHub</option>
+      <option value="hljs-github-dark">GitHub Dark</option>
+      <option value="hljs-dracula">Dracula</option>
+      <option value="hljs-monokai">Monokai</option>
+      <option value="hljs-solarized-light">Solarized Light</option>
+      <option value="hljs-solarized-dark">Solarized Dark</option>
+    </select>
     <button class="mode-toggle" id="modeToggle">Dark Mode</button>
   </div>
 </header>
@@ -133,8 +158,7 @@
   const menuPopup = document.getElementById('menuPopup');
   const menuOverlay = document.getElementById('menuOverlay');
   const navToggle = document.getElementById('navToggle');
-  const hljsLight = document.getElementById('hljs-light');
-  const hljsDark = document.getElementById('hljs-dark');
+  const themeSelector = document.getElementById('themeSelector');
   let activeWrapper = null, activeCodeEl = null, overBtn = false;
 
   /* Helpers */
@@ -233,12 +257,25 @@
   /* Dark mode */
   function setMode(dark) {
     document.body.classList.toggle('dark-mode', dark);
-    hljsLight.disabled = dark; hljsDark.disabled = !dark;
     document.getElementById('modeToggle').textContent = dark ? 'Light Mode' : 'Dark Mode';
     localStorage.setItem('mode', dark ? 'dark' : 'light');
   }
   setMode(localStorage.getItem('mode') === 'dark');
   document.getElementById('modeToggle').addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
+
+  /* Theme switching */
+  function setTheme(themeId) {
+    document.querySelectorAll('link[id^="hljs-"]').forEach(l => l.disabled = true);
+    const theme = document.getElementById(themeId);
+    if (theme) theme.disabled = false;
+    localStorage.setItem('hljs-theme', themeId);
+  }
+  themeSelector.addEventListener('change', e => setTheme(e.target.value));
+
+  // Restore saved theme
+  const savedTheme = localStorage.getItem('hljs-theme') || 'hljs-atom-light';
+  themeSelector.value = savedTheme;
+  setTheme(savedTheme);
 
   /* Nav */
   document.getElementById('homeBtn').addEventListener('click', e => { e.preventDefault(); renderMarkdown('README.md'); });
