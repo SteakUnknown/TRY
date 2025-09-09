@@ -106,11 +106,24 @@
   body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
   body.dark-mode .menu-popup a { color:#58a6ff; }
 
+  /* Scrollbar Light */
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-track { background:#f1f1f1; }
+  ::-webkit-scrollbar-thumb { background:#c1c1c1; border-radius:6px; }
+  ::-webkit-scrollbar-thumb:hover { background:#a0a0a0; }
+  * { scrollbar-width:thin; scrollbar-color:#c1c1c1 #f1f1f1; }
+
+  /* Scrollbar Dark */
+  body.dark-mode ::-webkit-scrollbar-track { background:#2c2c2c; }
+  body.dark-mode ::-webkit-scrollbar-thumb { background:#555; }
+  body.dark-mode ::-webkit-scrollbar-thumb:hover { background:#777; }
+  body.dark-mode * { scrollbar-color:#555 #2c2c2c; }
+
   /* Responsive */
   @media (max-width: 768px) {
-    nav.topbar-nav { display:none; }
+    nav.topbar-nav { display:none; } /* hide desktop nav */
     .nav-toggle-btn { display:inline-block; }
-    .theme-selector, .mode-toggle { display:none; }
+    .theme-selector, .mode-toggle { display:none; } /* hide in topbar */
   }
 </style>
 </head>
@@ -177,6 +190,7 @@
     menuPopup.classList.add('open');
     menuOverlay.classList.add('active');
 
+    // Add theme + mode toggle inside mobile menu
     if (!document.getElementById('mobileThemeSelector')) {
       const themeLabel = document.createElement('label');
       themeLabel.textContent = "Code Theme:";
@@ -215,7 +229,7 @@
       link.onclick = e => {
         e.preventDefault();
         closeMenu();
-        a.click();
+        a.click(); // trigger desktop logic
       };
       menuPopup.appendChild(link);
     });
@@ -246,10 +260,10 @@
 
   function positionBtn() {
     if (!activeWrapper) return;
-
     const rect = activeWrapper.getBoundingClientRect();
     const btnRect = floatingBtn.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
+
     const topbarHeight = document.querySelector('header.topbar').offsetHeight;
 
     if (rect.bottom <= 0 || rect.top >= vh) {
@@ -258,8 +272,10 @@
     }
 
     const left = Math.min(rect.right, vw) - btnRect.width - 8;
+
+    // Prevent clipping into topbar
     const minTop = topbarHeight + 8;
-    const desiredTop = Math.max(rect.top, minTop) + 8;
+    const desiredTop = Math.max(rect.top + 8, minTop);
 
     floatingBtn.style.left = left + 'px';
     floatingBtn.style.top = desiredTop + 'px';
@@ -304,11 +320,13 @@
     if (theme) theme.disabled = false;
     localStorage.setItem('hljs-theme', themeId);
 
+    // Sync with mobile selector if exists
     const mobileTheme = document.getElementById('mobileThemeSelector');
     if (mobileTheme) mobileTheme.value = themeId;
   }
   themeSelector.addEventListener('change', e => setTheme(e.target.value));
 
+  // Restore saved theme
   const savedTheme = localStorage.getItem('hljs-theme') || 'hljs-atom-light';
   themeSelector.value = savedTheme;
   setTheme(savedTheme);
