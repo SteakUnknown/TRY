@@ -6,7 +6,7 @@
 <title>Documentation</title>
 <link rel="icon" href="documentation.png" type="image/png">
 
-<!-- Highlight.js Themes (8 preload) -->
+<!-- Highlight.js Themes (preload 8) -->
 <link id="hljs-atom-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 <link id="hljs-atom-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
 <link id="hljs-github" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" disabled>
@@ -20,16 +20,14 @@
   html, body { margin:0; padding:0; font-family:system-ui, sans-serif; }
   body { display:flex; flex-direction:column; min-height:100vh; background:#f5f5f5; color:#24292e; }
 
-  /* Scrollbar styles (light + dark mode) */
+  /* Scrollbar */
   ::-webkit-scrollbar { width: 10px; height: 10px; }
-  ::-webkit-scrollbar-track { background: #f1f1f1; }
-  ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 6px; }
-  ::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
-  body.dark-mode ::-webkit-scrollbar-track { background: #2c2c2c; }
-  body.dark-mode ::-webkit-scrollbar-thumb { background: #555; }
-  body.dark-mode ::-webkit-scrollbar-thumb:hover { background: #777; }
-  * { scrollbar-width: thin; scrollbar-color: #c1c1c1 #f1f1f1; }
-  body.dark-mode * { scrollbar-color: #555 #2c2c2c; }
+  ::-webkit-scrollbar-thumb { background:#c1c1c1; border-radius:5px; }
+  ::-webkit-scrollbar-thumb:hover { background:#a8a8a8; }
+  ::-webkit-scrollbar-track { background:#f5f5f5; }
+  body.dark-mode ::-webkit-scrollbar-thumb { background:#444c56; }
+  body.dark-mode ::-webkit-scrollbar-thumb:hover { background:#666; }
+  body.dark-mode ::-webkit-scrollbar-track { background:#1e1e1e; }
 
   /* Topbar */
   header.topbar {
@@ -69,16 +67,12 @@
     overflow-y:auto;
   }
   .menu-popup.open { transform:translateX(0); }
-  .menu-popup a {
-    margin-bottom:1rem; color:#0366d6; text-decoration:none;
-    font-size:1.1rem; padding:0.5rem 0;
-  }
+  .menu-popup a { margin-bottom:1rem; color:#0366d6; text-decoration:none; font-size:1.1rem; }
   .menu-popup a:hover { text-decoration:underline; }
-  .menu-popup .mobile-controls {
-    margin-top:1.5rem; display:flex; flex-direction:column; gap:1rem;
-  }
   .menu-popup select, .menu-popup button {
-    padding:0.6rem; font-size:1rem; border-radius:6px; border:1px solid #ccc;
+    margin-top:1rem; padding:0.5rem; font-size:1rem;
+    border-radius:6px; border:1px solid #ccc;
+    background:#f5f5f5; cursor:pointer;
   }
 
   /* Content */
@@ -126,13 +120,13 @@
   body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
   body.dark-mode .menu-popup a { color:#58a6ff; }
   body.dark-mode .menu-popup select, 
-  body.dark-mode .menu-popup button { background:#2c2c2c; color:#f5f5f5; border-color:#444; }
+  body.dark-mode .menu-popup button { background:#2c2c2c; color:#e0e0e0; border-color:#555; }
 
   /* Responsive */
   @media (max-width: 768px) {
-    nav.topbar-nav { display:none; }
+    nav.topbar-nav { display:none; } /* hide desktop nav */
+    .theme-selector, .mode-toggle { display:none; } /* hide desktop toggles */
     .nav-toggle-btn { display:inline-block; }
-    .theme-selector, .mode-toggle { display:none; }
   }
 </style>
 </head>
@@ -189,6 +183,7 @@
   const modeToggle = document.getElementById('modeToggle');
   let activeWrapper = null, activeCodeEl = null, overBtn = false;
 
+  /* Helpers */
   function isMobile() {
     return window.innerWidth <= 768 || ('ontouchstart' in window);
   }
@@ -197,12 +192,14 @@
   function openMenu() {
     menuPopup.classList.add('open');
     menuOverlay.classList.add('active');
+
+    // Populate menu
     updateMenuLinks();
 
+    // Add theme + mode toggle
     if (!document.getElementById('mobileThemeSelector')) {
-      const controls = document.createElement('div');
-      controls.className = 'mobile-controls';
-
+      const themeLabel = document.createElement('label');
+      themeLabel.textContent = "Code Theme:";
       const mobileTheme = themeSelector.cloneNode(true);
       mobileTheme.id = 'mobileThemeSelector';
       mobileTheme.value = themeSelector.value;
@@ -213,11 +210,12 @@
 
       const darkBtn = document.createElement('button');
       darkBtn.textContent = modeToggle.textContent;
+      darkBtn.className = 'mode-toggle';
       darkBtn.onclick = () => modeToggle.click();
 
-      controls.appendChild(mobileTheme);
-      controls.appendChild(darkBtn);
-      menuPopup.appendChild(controls);
+      menuPopup.appendChild(themeLabel);
+      menuPopup.appendChild(mobileTheme);
+      menuPopup.appendChild(darkBtn);
     }
   }
   function closeMenu() {
@@ -236,7 +234,7 @@
       link.onclick = e => {
         e.preventDefault();
         closeMenu();
-        a.click();
+        a.click(); // trigger desktop logic
       };
       menuPopup.appendChild(link);
     });
@@ -270,19 +268,14 @@
     const rect = activeWrapper.getBoundingClientRect();
     const btnRect = floatingBtn.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
-    const topbarHeight = document.querySelector('header.topbar').offsetHeight;
-
     if (rect.bottom <= 0 || rect.top >= vh) {
       floatingBtn.classList.remove('show', 'always-visible');
       return;
     }
-
     const left = Math.min(rect.right, vw) - btnRect.width - 8;
-    const minTop = topbarHeight + 8;
-    const desiredTop = Math.max(rect.top, minTop) + 8;
-
+    const top = Math.max(rect.top, 0) + 8;
     floatingBtn.style.left = left + 'px';
-    floatingBtn.style.top = desiredTop + 'px';
+    floatingBtn.style.top = top + 'px';
   }
 
   /* Markdown */
@@ -312,9 +305,11 @@
   function setMode(dark) {
     document.body.classList.toggle('dark-mode', dark);
     modeToggle.textContent = dark ? 'Light Mode' : 'Dark Mode';
-    const mobileBtn = document.querySelector('.mobile-controls button');
-    if (mobileBtn) mobileBtn.textContent = modeToggle.textContent;
     localStorage.setItem('mode', dark ? 'dark' : 'light');
+
+    // Sync with mobile button
+    const darkBtn = document.querySelector('#mobileThemeSelector + button');
+    if (darkBtn) darkBtn.textContent = modeToggle.textContent;
   }
   setMode(localStorage.getItem('mode') === 'dark');
   modeToggle.addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
@@ -326,11 +321,13 @@
     if (theme) theme.disabled = false;
     localStorage.setItem('hljs-theme', themeId);
 
+    // Sync with mobile selector if exists
     const mobileTheme = document.getElementById('mobileThemeSelector');
     if (mobileTheme) mobileTheme.value = themeId;
   }
   themeSelector.addEventListener('change', e => setTheme(e.target.value));
 
+  // Restore saved theme
   const savedTheme = localStorage.getItem('hljs-theme') || 'hljs-atom-light';
   themeSelector.value = savedTheme;
   setTheme(savedTheme);
