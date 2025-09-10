@@ -124,8 +124,8 @@
 
   /* Responsive */
   @media (max-width: 768px) {
-    nav.topbar-nav { display:none; } /* hide desktop nav */
-    .theme-selector, .mode-toggle { display:none; } /* hide desktop toggles */
+    nav.topbar-nav { display:none; }
+    .theme-selector, .mode-toggle { display:none; }
     .nav-toggle-btn { display:inline-block; }
   }
 </style>
@@ -193,30 +193,27 @@
     menuPopup.classList.add('open');
     menuOverlay.classList.add('active');
 
-    // Populate menu
     updateMenuLinks();
 
-    // Add theme + mode toggle
-    if (!document.getElementById('mobileThemeSelector')) {
-      const themeLabel = document.createElement('label');
-      themeLabel.textContent = "Code Theme:";
-      const mobileTheme = themeSelector.cloneNode(true);
-      mobileTheme.id = 'mobileThemeSelector';
-      mobileTheme.value = themeSelector.value;
-      mobileTheme.addEventListener('change', e => {
-        themeSelector.value = e.target.value;
-        setTheme(e.target.value);
-      });
+    // Add theme selector + dark/light mode button
+    const themeLabel = document.createElement('label');
+    themeLabel.textContent = "Code Theme:";
+    const mobileTheme = themeSelector.cloneNode(true);
+    mobileTheme.id = 'mobileThemeSelector';
+    mobileTheme.value = themeSelector.value;
+    mobileTheme.addEventListener('change', e => {
+      themeSelector.value = e.target.value;
+      setTheme(e.target.value);
+    });
 
-      const darkBtn = document.createElement('button');
-      darkBtn.textContent = modeToggle.textContent;
-      darkBtn.className = 'mode-toggle';
-      darkBtn.onclick = () => modeToggle.click();
+    const darkBtn = document.createElement('button');
+    darkBtn.textContent = modeToggle.textContent;
+    darkBtn.className = 'mode-toggle';
+    darkBtn.onclick = () => modeToggle.click();
 
-      menuPopup.appendChild(themeLabel);
-      menuPopup.appendChild(mobileTheme);
-      menuPopup.appendChild(darkBtn);
-    }
+    menuPopup.appendChild(themeLabel);
+    menuPopup.appendChild(mobileTheme);
+    menuPopup.appendChild(darkBtn);
   }
   function closeMenu() {
     menuPopup.classList.remove('open');
@@ -234,7 +231,7 @@
       link.onclick = e => {
         e.preventDefault();
         closeMenu();
-        a.click(); // trigger desktop logic
+        a.click();
       };
       menuPopup.appendChild(link);
     });
@@ -306,10 +303,6 @@
     document.body.classList.toggle('dark-mode', dark);
     modeToggle.textContent = dark ? 'Light Mode' : 'Dark Mode';
     localStorage.setItem('mode', dark ? 'dark' : 'light');
-
-    // Sync with mobile button
-    const darkBtn = document.querySelector('#mobileThemeSelector + button');
-    if (darkBtn) darkBtn.textContent = modeToggle.textContent;
   }
   setMode(localStorage.getItem('mode') === 'dark');
   modeToggle.addEventListener('click', () => setMode(!document.body.classList.contains('dark-mode')));
@@ -321,13 +314,11 @@
     if (theme) theme.disabled = false;
     localStorage.setItem('hljs-theme', themeId);
 
-    // Sync with mobile selector if exists
     const mobileTheme = document.getElementById('mobileThemeSelector');
     if (mobileTheme) mobileTheme.value = themeId;
   }
   themeSelector.addEventListener('change', e => setTheme(e.target.value));
 
-  // Restore saved theme
   const savedTheme = localStorage.getItem('hljs-theme') || 'hljs-atom-light';
   themeSelector.value = savedTheme;
   setTheme(savedTheme);
