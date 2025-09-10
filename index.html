@@ -6,7 +6,7 @@
 <title>Documentation</title>
 <link rel="icon" href="documentation.png" type="image/png">
 
-<!-- Highlight.js Themes (preload 8) -->
+<!-- Highlight.js Themes (8 preload) -->
 <link id="hljs-atom-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
 <link id="hljs-atom-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" disabled>
 <link id="hljs-github" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" disabled>
@@ -19,6 +19,42 @@
 <style>
   html, body { margin:0; padding:0; font-family:system-ui, sans-serif; }
   body { display:flex; flex-direction:column; min-height:100vh; background:#f5f5f5; color:#24292e; }
+
+  /* 🌞 Light mode scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+  }
+
+  /* 🌚 Dark mode scrollbar */
+  body.dark-mode ::-webkit-scrollbar-track {
+    background: #2c2c2c;
+  }
+  body.dark-mode ::-webkit-scrollbar-thumb {
+    background: #555;
+  }
+  body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: #777;
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+  }
+  body.dark-mode * {
+    scrollbar-color: #555 #2c2c2c;
+  }
 
   /* Topbar */
   header.topbar {
@@ -106,24 +142,11 @@
   body.dark-mode .menu-popup { background:#1c1c1c; border-color:#333; }
   body.dark-mode .menu-popup a { color:#58a6ff; }
 
-  /* Scrollbar Light */
-  ::-webkit-scrollbar { width:10px; height:10px; }
-  ::-webkit-scrollbar-track { background:#f1f1f1; }
-  ::-webkit-scrollbar-thumb { background:#c1c1c1; border-radius:6px; }
-  ::-webkit-scrollbar-thumb:hover { background:#a0a0a0; }
-  * { scrollbar-width:thin; scrollbar-color:#c1c1c1 #f1f1f1; }
-
-  /* Scrollbar Dark */
-  body.dark-mode ::-webkit-scrollbar-track { background:#2c2c2c; }
-  body.dark-mode ::-webkit-scrollbar-thumb { background:#555; }
-  body.dark-mode ::-webkit-scrollbar-thumb:hover { background:#777; }
-  body.dark-mode * { scrollbar-color:#555 #2c2c2c; }
-
   /* Responsive */
   @media (max-width: 768px) {
-    nav.topbar-nav { display:none; } /* hide desktop nav */
+    nav.topbar-nav { display:none; }
     .nav-toggle-btn { display:inline-block; }
-    .theme-selector, .mode-toggle { display:none; } /* hide in topbar */
+    .theme-selector, .mode-toggle { display:none; }
   }
 </style>
 </head>
@@ -229,7 +252,7 @@
       link.onclick = e => {
         e.preventDefault();
         closeMenu();
-        a.click(); // trigger desktop logic
+        a.click();
       };
       menuPopup.appendChild(link);
     });
@@ -263,7 +286,6 @@
     const rect = activeWrapper.getBoundingClientRect();
     const btnRect = floatingBtn.getBoundingClientRect();
     const vw = window.innerWidth, vh = window.innerHeight;
-
     const topbarHeight = document.querySelector('header.topbar').offsetHeight;
 
     if (rect.bottom <= 0 || rect.top >= vh) {
@@ -272,10 +294,8 @@
     }
 
     const left = Math.min(rect.right, vw) - btnRect.width - 8;
-
-    // Prevent clipping into topbar
     const minTop = topbarHeight + 8;
-    const desiredTop = Math.max(rect.top + 8, minTop);
+    const desiredTop = Math.max(rect.top, minTop) + 8;
 
     floatingBtn.style.left = left + 'px';
     floatingBtn.style.top = desiredTop + 'px';
@@ -320,13 +340,11 @@
     if (theme) theme.disabled = false;
     localStorage.setItem('hljs-theme', themeId);
 
-    // Sync with mobile selector if exists
     const mobileTheme = document.getElementById('mobileThemeSelector');
     if (mobileTheme) mobileTheme.value = themeId;
   }
   themeSelector.addEventListener('change', e => setTheme(e.target.value));
 
-  // Restore saved theme
   const savedTheme = localStorage.getItem('hljs-theme') || 'hljs-atom-light';
   themeSelector.value = savedTheme;
   setTheme(savedTheme);
